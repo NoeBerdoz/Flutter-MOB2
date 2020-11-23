@@ -1,82 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
+
+// TUTORIAL TODO https://levelup.gitconnected.com/making-a-flutter-todo-app-from-scratch-part-1-bd66608b1818
 
 void main() => runApp(MyApp()); // => one line function
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      home: RandomWords(),
-    );
-  }
-}
 
-class MyButton extends StatelessWidget {
+List<String> items = ["Item 1", "Item 2", "Item 3"];
+
+class MyApp extends StatelessWidget { // State can not change
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print('My Button was tapped!');
-      },
-      child: Container(
-        height: 36.0,
-        padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
-          color: Colors.lightGreen[500],
-        ),
-        child: Center(
-          child: Text('Engage'),
-        )
-      ),
+    return MaterialApp(
+      title: 'Make this a TodoApp',
+      home: App(),
     );
   }
 }
 
 //created with stful
-class RandomWords extends StatefulWidget {
+
+class App extends StatefulWidget{ // State can change
   @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-  @override
-  Widget build(BuildContext context) {
-    final _suggestions = <WordPair>[];
-    final _biggerFont = TextStyle(fontSize: 18.0);
-
-    Widget _buildRow(WordPair pair) {
-      return ListTile(
-        title: Text(
-          pair.asPascalCase,
-          style: _biggerFont,
-        )
-      );
-    }
-
-    Widget _buildSuggestions() {
-      return ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) return Divider();
-          final index = i ~/ 2;
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
-          }
-          return _buildRow(_suggestions[index]);
-        });
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Startup Name Generator'),
-      ),
-      body: _buildSuggestions(),
-    );
-
+  AppState createState() {
+    return AppState();
   }
 }
+
+class AppState extends State<App> {
+    Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar( // Header Bar
+          title: Text("Header Bar"),
+        ),
+        body: ReorderableListView(
+          onReorder: (int oldIndex, int newIndex) {
+            setState(() { // re-draw screen if change
+              if(oldIndex < newIndex){
+                newIndex -= 1; // Hold index in temporary location
+              }
+              var getReplacedWidget = items.removeAt(oldIndex); // remove existing index
+              items.insert(newIndex, getReplacedWidget); // insert new index
+
+            });
+          },
+          children: <Widget>[
+            // Take string from list and embed it into Text Widget
+            for(final value in items)
+              Text(
+                value,
+                key: Key(value),
+                style: TextStyle(
+                  fontSize: 22.0
+                ),
+              )
+          ],
+
+
+        ),
+
+      );
+    }
+}
+
+
+
